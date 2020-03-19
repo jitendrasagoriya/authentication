@@ -1,0 +1,16 @@
+Authentication
+    1)  username        String          Primery Key
+    2)  passward        String          Not Null
+    3)  userid          String          Not Null
+    4)  appId           String          Not Null
+    5)  appName         String          Not Null
+    6)  token           String          Not Null
+    7)  expire-day      Number          Not Null
+    8)  creationDate    Timestamp       Default (System date)
+    9)  lastLogin       Timestamp       Null
+
+Authorization
+	1) username         String          Foreign Key
+	2) accessType       String  		Not Null
+	
+	
