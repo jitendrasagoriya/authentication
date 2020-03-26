@@ -20,4 +20,5 @@ public interface AuthenticationService {
     public String generateAccessToken(String email,  String password ,String salt);
     public Authentication login(String accessToken);
     public boolean updateLastLogin(String accessToken);
+    public Boolean deleteByToken(String accessToken);
 }

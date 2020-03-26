@@ -87,4 +87,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     public Application getByAppAccess(String access) throws NoSuchBeanException {
         return applicationDaoService.getByAppAccess(access);
     }
+
+    @Override
+    public Boolean deleteByAppIdAndAccess(String id, String access) throws NoSuchBeanException {
+        return applicationDaoService.deleteByAppIdAndAccess(id,access);
+    }
 }

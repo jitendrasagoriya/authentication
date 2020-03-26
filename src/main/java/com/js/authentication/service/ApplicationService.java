@@ -33,5 +33,5 @@ public interface ApplicationService {
 
     public Application getByAppAccess(String access) throws NoSuchBeanException;
 
-
+    public Boolean deleteByAppIdAndAccess(String id, String access) throws NoSuchBeanException;
 }

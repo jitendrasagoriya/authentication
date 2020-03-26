@@ -34,4 +34,8 @@ public interface AuthenticationRepository extends JpaRepository<Authentication,S
     @Modifying(flushAutomatically = true,clearAutomatically = true)
     @Query("UPDATE Authentication A SET A.isLogout = true WHERE A.token = :accessToken")
     public int logout(@Param("accessToken") String accessToken);
+
+    @Modifying(flushAutomatically = true,clearAutomatically = true)
+    @Query("DELETE FROM Authentication A WHERE A.token = :accessToken")
+    public int deleteByToken(@Param("accessToken") String accessToken);
 }

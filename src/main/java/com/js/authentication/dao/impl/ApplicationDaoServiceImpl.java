@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.expression.spel.ast.NullLiteral;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -86,6 +86,12 @@ public class ApplicationDaoServiceImpl implements ApplicationDaoService<Applicat
     @Override
     public Application getByAppAccess(String access) throws NoSuchBeanException {
         return repository.getApplicationByAccessToken(access);
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteByAppIdAndAccess(String id, String access) throws NoSuchBeanException {
+        return repository.deleteApplicationByAppidAndAccess(access,id)>0?Boolean.TRUE:Boolean.FALSE;
     }
 
     @Override

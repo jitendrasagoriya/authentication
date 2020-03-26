@@ -74,6 +74,12 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
     }
 
     @Override
+    @Transactional
+    public Boolean deleteByToken(String accessToken) {
+        return authenticationRepository.deleteByToken(accessToken) > 0?Boolean.TRUE:Boolean.FALSE;
+    }
+
+    @Override
     public AuthenticationRepository getRepository() {
         return authenticationRepository;
     }

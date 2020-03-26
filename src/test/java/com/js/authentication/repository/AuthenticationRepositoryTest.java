@@ -84,4 +84,11 @@ public class AuthenticationRepositoryTest {
         assertThat(i).isEqualTo(1);
     }
 
+    @Test
+    public void testDeleteByToken() {
+        int i = repository.deleteByToken("HNDHDN655HD5DH");
+        assertThat(i)
+                .isEqualTo(1);
+    }
+
 }

@@ -101,6 +101,24 @@ public class AuthenticationEndpointTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo( HttpStatus.UNAUTHORIZED);
     }
 
+    @Test
+    public void addAuthentication() {
+        headers.add("X-AUTH-LOG-HEADER-APP-ACCESS","GHGI5KFJGFKDKJ5");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Authentication authentication = new Authentication.AuthenticationBuilder("D579446",
+                "Pass123")
+                .build();
+        HttpEntity<Authentication> entity = new HttpEntity<>(authentication, headers);
+
+        ResponseEntity<Authentication> responseEntity = restTemplate.postForEntity(
+                createURLWithPort("/api/authentication/"),
+                entity,
+                Authentication.class
+        );
+        assertThat(responseEntity.getStatusCode()).isEqualTo( HttpStatus.OK);
+    }
+
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }

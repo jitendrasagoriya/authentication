@@ -19,5 +19,5 @@ public interface AuthenticationDaoService<R> extends BaseSerivce<R> {
     public List<Authentication> byAppId(String appId);
     public Page<Authentication> byAppId(String appId, Pageable pageable);
     public boolean updateLastLogin(String accessToken);
-
+    public Boolean deleteByToken(String accessToken);
 }

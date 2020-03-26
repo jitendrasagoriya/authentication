@@ -2,6 +2,7 @@ package com.js.authentication.repository;
 
 import com.js.authentication.builder.ApplicationBuilder;
 import com.js.authentication.model.Application;
+import com.js.authentication.password.PasswordUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,5 +61,11 @@ public class ApplicationRepositoryTest {
         assertThat(found).isNull();
     }
 
+    @Test
+    public void testDeleteApplicationByAppidAndAccess() {
+        int deleteCount = repository.deleteApplicationByAppidAndAccess("GHGSDFSSFFKD5","MYID126");
+        assertThat(deleteCount)
+                .isEqualTo(1);
+    }
 
 }

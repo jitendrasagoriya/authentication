@@ -32,4 +32,6 @@ public interface ApplicationDaoService<R> extends BaseSerivce<R> {
     public Application getByAppIdAndAccess(String id, String access) throws NoSuchBeanException;
 
     public Application getByAppAccess( String access) throws NoSuchBeanException;
+
+    public Boolean deleteByAppIdAndAccess(String id,String access) throws NoSuchBeanException;
 }

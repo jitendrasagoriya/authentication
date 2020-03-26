@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -50,7 +51,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public Authentication saveAuthentication(Authentication authentication) {
-        return null;
+        authentication.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        authentication.setExpaireDay(10);
+        authentication.setIsActive(Boolean.TRUE);
+        authentication.setIsLogout(Boolean.TRUE);
+        authentication.setUserId(SecureTokenGenerator.getUserId(10));
+        return daoService.saveAuthentication(authentication);
     }
 
     @Override
@@ -80,16 +86,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public Authentication login(String accessToken) {
+
         Authentication authentication = daoService.getUserByToken(accessToken);
-        authentication.setPassward("");
-        authentication.setToken("");
-        //UPDATE LAST LOGIN DATE
-        updateLastLogin(accessToken);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Authentication fail : Access Token :"
+                    + accessToken);
+        }
+
+        if(authentication != null) {
+            authentication.setPassward("");
+            authentication.setToken("");
+            //UPDATE LAST LOGIN DATE
+            updateLastLogin(accessToken);
+        }
         return authentication;
     }
 
     @Override
     public boolean updateLastLogin(String accessToken) {
         return daoService.updateLastLogin(accessToken);
+    }
+
+    @Override
+    public Boolean deleteByToken(String accessToken) {
+        return daoService.deleteByToken(accessToken);
     }
 }
