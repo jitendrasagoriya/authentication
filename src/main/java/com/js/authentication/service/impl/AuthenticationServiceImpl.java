@@ -93,9 +93,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     + accessToken);
         }
 
-        if(authentication != null) {
-            authentication.setPassward("");
-            authentication.setToken("");
+        if(authentication != null) { 
             //UPDATE LAST LOGIN DATE
             updateLastLogin(accessToken);
         }

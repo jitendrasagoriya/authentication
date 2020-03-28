@@ -59,6 +59,10 @@ public class AuthenticationEndpoint {
 
             authentication = commonService.getAuthenticationService().login(access);
 
+            Authentication responce = new Authentication.AuthenticationBuilder(authentication).build();
+            responce.setToken("");
+            responce.setPassward("");
+
             return new ResponseEntity<>(authentication, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

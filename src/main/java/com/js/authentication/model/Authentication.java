@@ -80,7 +80,20 @@ public class Authentication {
         private Boolean isLogout;
         private Boolean isActive;
 
-        public AuthenticationBuilder (String userName,String passward) {
+        public AuthenticationBuilder( Authentication authentication ) {
+            this.userName = authentication.userName;
+            this.passward = authentication.passward;
+            this.userId = authentication.userId;
+            this.appId = authentication.appId;
+            this.token = authentication.token;
+            this.expaireDay = authentication.expaireDay;
+            this.creationDate = authentication.creationDate;
+            this.lastLogin = authentication.lastLogin;
+            this.isLogout = authentication.isLogout;
+            this.isActive = authentication.isActive;
+        }
+
+        public AuthenticationBuilder (String userName, String passward) {
             this.userName = userName;
             this.passward = passward;
         }
@@ -141,6 +154,8 @@ public class Authentication {
             validateUserObject(authentication);
             return authentication;
         }
+
+
 
         public String buildJson() throws JsonProcessingException {
             ObjectMapper objectMapper = new ObjectMapper();
