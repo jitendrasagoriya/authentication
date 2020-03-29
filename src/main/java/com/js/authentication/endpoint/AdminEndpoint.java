@@ -39,7 +39,7 @@ public class AdminEndpoint {
     }
 
 
-    @GetMapping(path = {"{appid/},{appid}"} )
+    @GetMapping(path = {"{appid/}","{appid}"} )
     public ResponseEntity<?> getAll(@PathVariable("appid") String applicationId , Pageable pageable) {
         try {
             return new ResponseEntity<Page>(commonService.getAuthenticationService()
