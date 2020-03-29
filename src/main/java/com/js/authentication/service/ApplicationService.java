@@ -2,6 +2,8 @@ package com.js.authentication.service;
 
 import com.js.authentication.exception.NoSuchBeanException;
 import com.js.authentication.model.Application;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public interface ApplicationService {
     public String getSaltByAccessKey(String accessKey) throws NoSuchBeanException;
 
     public List<Application> getAll();
+
+    public Page<Application> getAll(Pageable pageable);
 
     public Application getByName(String name);
 

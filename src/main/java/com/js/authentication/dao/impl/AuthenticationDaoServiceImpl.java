@@ -80,6 +80,11 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
     }
 
     @Override
+    public Page<Authentication> getAll(Pageable pageable) {
+        return authenticationRepository.findAll(pageable);
+    }
+
+    @Override
     public AuthenticationRepository getRepository() {
         return authenticationRepository;
     }

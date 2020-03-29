@@ -109,4 +109,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Boolean deleteByToken(String accessToken) {
         return daoService.deleteByToken(accessToken);
     }
+
+    @Override
+    public Page<Authentication> getAll(Pageable pageable) {
+        return daoService.getAll(pageable);
+    }
 }

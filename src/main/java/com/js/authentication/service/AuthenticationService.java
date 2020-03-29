@@ -21,4 +21,6 @@ public interface AuthenticationService {
     public Authentication login(String accessToken);
     public boolean updateLastLogin(String accessToken);
     public Boolean deleteByToken(String accessToken);
+
+    public Page<Authentication> getAll ( Pageable pageable);
 }
