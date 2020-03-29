@@ -27,7 +27,7 @@ public class AdminEndpoint {
     @Autowired
     private CommonService commonService;
 
-    @GetMapping(path = {""} ,consumes = { MediaType.APPLICATION_JSON_VALUE })
+    @GetMapping(path = {""}  )
     public ResponseEntity<?> getAll(Pageable pageable) {
         try {
             return new ResponseEntity<Page>(commonService.getAuthenticationService().getAll(pageable), HttpStatus.OK);
@@ -39,7 +39,7 @@ public class AdminEndpoint {
     }
 
 
-    @GetMapping(path = {"{appid/},{appid}"} ,consumes = { MediaType.APPLICATION_JSON_VALUE })
+    @GetMapping(path = {"{appid/},{appid}"} )
     public ResponseEntity<?> getAll(@PathVariable("appid") String applicationId , Pageable pageable) {
         try {
             return new ResponseEntity<Page>(commonService.getAuthenticationService()
