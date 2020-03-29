@@ -93,7 +93,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     + accessToken);
         }
 
-        if(authentication != null) { 
+        if(authentication != null) {
             //UPDATE LAST LOGIN DATE
             updateLastLogin(accessToken);
         }

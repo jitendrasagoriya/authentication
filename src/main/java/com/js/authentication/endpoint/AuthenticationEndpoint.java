@@ -40,7 +40,7 @@ public class AuthenticationEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getLocalizedMessage(), e);
-            return new ResponseEntity<>(e, HttpStatus.EXPECTATION_FAILED);
+            return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
         }
     }
 
@@ -67,7 +67,7 @@ public class AuthenticationEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getLocalizedMessage(), e);
-            return new ResponseEntity<>(e, HttpStatus.EXPECTATION_FAILED);
+            return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
         }
     }
 
@@ -92,7 +92,7 @@ public class AuthenticationEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getLocalizedMessage(), e);
-            return new ResponseEntity<Exception>(e, HttpStatus.EXPECTATION_FAILED);
+            return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
         }
 
     }
@@ -116,7 +116,7 @@ public class AuthenticationEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getLocalizedMessage(), e);
-            return new ResponseEntity<>(e, HttpStatus.EXPECTATION_FAILED);
+            return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
         }
     }
 
@@ -137,7 +137,7 @@ public class AuthenticationEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getLocalizedMessage(), e);
-            return new ResponseEntity<>(e, HttpStatus.EXPECTATION_FAILED);
+            return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
         }
     }
 
