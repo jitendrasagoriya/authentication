@@ -31,7 +31,7 @@ public class SpringFoxConfig extends WebMvcConfigurerAdapter {
 
     private ApiInfo apiInfo(){
         return new ApiInfoBuilder()
-                .title("Home Help Management")
+                .title("Common Authentication App.")
                 .version("1.0")
                 .build();
 
