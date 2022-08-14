@@ -21,19 +21,19 @@ import java.sql.Timestamp;
 public class Authentication {
 
     @Id
-    @Column(name = "USERNAME")
+    @Column(name = "USERNAME", length = 255)
     private String userName;
 
-    @Column(name = "PASSWORD")
+    @Column(name = "PASSWORD",length = 255)
     private String passward;
 
-    @Column(name = "USERID")
+    @Column(name = "USERID",length = 255)
     private String userId;
 
-    @Column(name = "APPID")
+    @Column(name = "APPID",length = 255)
     private String appId;
 
-    @Column(name = "TOKEN")
+    @Column(name = "TOKEN",length = 255)
     private String token;
 
     @Column(name = "EXPIREDAY" ,columnDefinition = "int default 1")
@@ -48,8 +48,14 @@ public class Authentication {
     @Column(name = "ISLOGOUT" ,columnDefinition = "boolean default false")
     private Boolean isLogout;
 
-    @Column(name = "ISACTIVE" ,columnDefinition = "boolean default true")
+    @Column(name = "ISACTIVE" ,columnDefinition = "boolean default false")
     private Boolean isActive;
+    
+    @Column(name = "VERIFICATIONCODE", length = 64)
+    private String verificationCode;
+    
+    @Column(name = "OTB" ,columnDefinition = "boolean default false")
+    private Boolean otp; 
 
 
 
@@ -64,6 +70,8 @@ public class Authentication {
         this.userId = authenticationBuilder.userId;
         this.userName = authenticationBuilder.userName;
         this.isActive = authenticationBuilder.isActive;
+        this.otp = authenticationBuilder.otp;
+        this.verificationCode = authenticationBuilder.verificationCode;
 
     }
 
@@ -78,7 +86,11 @@ public class Authentication {
         private Timestamp creationDate;
         private Timestamp lastLogin;
         private Boolean isLogout;
-        private Boolean isActive;
+        private Boolean isActive; 
+        private String verificationCode;
+        private Boolean otp;
+        
+        public AuthenticationBuilder(  ) {}
 
         public AuthenticationBuilder( Authentication authentication ) {
             this.userName = authentication.userName;
@@ -91,11 +103,23 @@ public class Authentication {
             this.lastLogin = authentication.lastLogin;
             this.isLogout = authentication.isLogout;
             this.isActive = authentication.isActive;
+            this.verificationCode = authentication.verificationCode;
+            this.otp = authentication.otp;
+        }
+        
+        public AuthenticationBuilder otp(Boolean otp) {
+            this.otp = otp;
+            return this;
         }
 
         public AuthenticationBuilder (String userName, String passward) {
             this.userName = userName;
             this.passward = passward;
+        }
+        
+        public AuthenticationBuilder verificationCode(String code) {
+            this.verificationCode = code;
+            return this;
         }
 
         public AuthenticationBuilder userName(String userName) {

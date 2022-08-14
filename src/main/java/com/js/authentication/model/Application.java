@@ -24,16 +24,16 @@ public class Application implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "ID")
+    @Column(name = "ID",length = 255)
     private String id;
 
-    @Column(name = "APPNAME",unique = true)
+    @Column(name = "APPNAME",unique = true,length = 255)
     private String appName;
 
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @Column(name = "ACCESS", nullable = false)
+    @Column(name = "ACCESS", nullable = false,length = 255)
     private String access;
 
     @Column(name = "CREATIONTIME",columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

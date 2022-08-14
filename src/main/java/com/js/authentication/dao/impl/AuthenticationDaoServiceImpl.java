@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<AuthenticationRepository> {
@@ -88,4 +89,22 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
     public AuthenticationRepository getRepository() {
         return authenticationRepository;
     }
+
+	@Override
+	public Optional<Authentication> getUserByEmail(String email) { 
+		Authentication authentication = authenticationRepository.getAuthentication(email);
+		if(authentication==null)
+			return Optional.empty();
+		return Optional.of(authentication);
+	}
+
+	@Override
+	public Authentication save(Authentication authentication) {
+		return authenticationRepository.saveAndFlush(authentication);
+	}
+
+	@Override
+	public Authentication findByVerificationCode(String verificationCode) { 
+		return authenticationRepository.findByVerificationCode(verificationCode);
+	}
 }
