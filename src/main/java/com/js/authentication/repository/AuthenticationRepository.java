@@ -38,4 +38,10 @@ public interface AuthenticationRepository extends JpaRepository<Authentication,S
     @Modifying(flushAutomatically = true,clearAutomatically = true)
     @Query("DELETE FROM Authentication A WHERE A.token = :accessToken")
     public int deleteByToken(@Param("accessToken") String accessToken);
+    
+    @Query("SELECT A FROM Authentication A WHERE A.userName = :email")
+    public Authentication getAuthentication(@Param("email") String email );
+    
+    @Query("SELECT A FROM Authentication A WHERE A.verificationCode = :verificationCode")
+    public Authentication findByVerificationCode(@Param("verificationCode") String verificationCode );
 }
