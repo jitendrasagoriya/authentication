@@ -139,13 +139,13 @@ public class AuthenticationEndpoint {
 			Optional<Authentication> auth = commonService.getAuthenticationService().getUserByToken(access);
 
 			if (!auth.isPresent())
-				return new ResponseEntity<String>("Invalid access token. Please login again.", HttpStatus.OK);
+				return new ResponseEntity<String>("Invalid access token. Please login again.", HttpStatus.UNAUTHORIZED);
 
 			String currentPassword = PasswordUtils.generateSecurePassword(request.getOldPassword(),
 					application.getSalt());
 
 			if (!StringUtils.equals(auth.get().getPassward(), currentPassword))
-				return new ResponseEntity<String>("Incorrect current password.", HttpStatus.OK);
+				return new ResponseEntity<String>("Incorrect current password.", HttpStatus.BAD_REQUEST);
 
 			Authentication authentication = auth.get();
 			authentication
@@ -166,11 +166,11 @@ public class AuthenticationEndpoint {
 	}
 
 	@GetMapping("/verify")
-	public String verifyUser(@Param("code") String code) {
+	public ResponseEntity<String> verifyUser(@Param("code") String code) {
 		if (commonService.getAuthenticationService().verify(code)) {
-			return "verify_success";
+			return new ResponseEntity<String>("Success", HttpStatus.OK);
 		} else {
-			return "verify_fail";
+			return new ResponseEntity<String>("Fail", HttpStatus.OK);
 		}
 	}
 
@@ -188,7 +188,7 @@ public class AuthenticationEndpoint {
 			Optional<Authentication> auth = commonService.getAuthenticationService().getUserByEmail(email);
 			if (!auth.isPresent()) {
 				logger.error("User is not registered.:" + email);
-				return new ResponseEntity<Exception>(new NoSuchUserFound(email), HttpStatus.OK);
+				return new ResponseEntity<Exception>(new NoSuchUserFound(email), HttpStatus.BAD_REQUEST);
 			}
 
 			Authentication authentication = auth.get();
@@ -216,7 +216,9 @@ public class AuthenticationEndpoint {
 
 	@PostMapping(path = "register/{appid}", consumes = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<?> add(@PathVariable("appid") String appid,
-			@RequestHeader("X-AUTH-LOG-HEADER-APP-ACCESS") String appAccess, @RequestBody Authentication authentication,
+			@RequestHeader("X-AUTH-LOG-HEADER-APP-ACCESS") String appAccess,
+			@RequestHeader("X-HEADER-APP-URL") String appBaseUrl,
+			@RequestBody Authentication authentication,
 			HttpServletRequest request) {
 		try {
 			Application application = commonService.getApplicationService().getByAppIdAndAccess(appid, appAccess);
@@ -231,7 +233,7 @@ public class AuthenticationEndpoint {
 			if (auth.isPresent()) {
 				logger.error("User is already registeded.:" + authentication.getUserName());
 				return new ResponseEntity<Exception>(new UserAlreadyExixts(authentication.getUserName()),
-						HttpStatus.OK);
+						HttpStatus.FOUND);
 			}
 
 			String randomCode = RandomString.make(64);
@@ -241,7 +243,10 @@ public class AuthenticationEndpoint {
 					PasswordUtils.generateSecurePassword(authentication.getPassward(), application.getSalt()));
 			authentication.setAppId(application.getId());
 			authentication = commonService.getAuthenticationService().save(authentication);
-			emailService.sendVerificationEmail(authentication, getSiteURL(request));
+			if(StringUtils.isBlank(appBaseUrl))
+				appBaseUrl = getSiteURL(request);
+			
+			emailService.sendVerificationEmail(authentication, appBaseUrl);
 			return new ResponseEntity<>(
 					new Authentication.AuthenticationBuilder().userName(authentication.getUserName())
 							.appId(authentication.getAppId()).userId(authentication.getUserId()).build(),
