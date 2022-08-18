@@ -1,6 +1,7 @@
 package com.js.authentication.service;
 
 import com.js.authentication.exception.NoSuchUserFound;
+import com.js.authentication.exception.UserNotVerified;
 import com.js.authentication.model.Authentication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ public interface AuthenticationService {
     public Boolean logOut(String accessToken);
     public List<Authentication> getByAppId(String appId);
     public Page<Authentication> getByAppId(String appId, Pageable pageable);
-    public Optional<String> generateAccessToken(String email,  String password ,String salt) throws NoSuchUserFound;
+    public Optional<String> generateAccessToken(String email,  String password ,String salt) throws NoSuchUserFound, UserNotVerified;
     public Authentication login(String accessToken);
     public boolean updateLastLogin(String accessToken);
     public Boolean deleteByToken(String accessToken);

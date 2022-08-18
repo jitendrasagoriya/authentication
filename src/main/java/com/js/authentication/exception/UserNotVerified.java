@@ -3,8 +3,7 @@ package com.js.authentication.exception;
 public class UserNotVerified extends Exception{
 
 	public UserNotVerified() {
-		super();
-		// TODO Auto-generated constructor stub
+		super("User is not verified."); 
 	}
 
 	public UserNotVerified(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
