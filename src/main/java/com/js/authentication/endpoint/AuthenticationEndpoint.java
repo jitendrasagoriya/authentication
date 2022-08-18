@@ -3,6 +3,7 @@ package com.js.authentication.endpoint;
 import com.js.authentication.dto.ChangePassword;
 import com.js.authentication.dto.LoginDto;
 import com.js.authentication.exception.ApplicationNotRegistered;
+import com.js.authentication.exception.InvalidUserNameAndPassword;
 import com.js.authentication.exception.NoSuchUserFound;
 import com.js.authentication.exception.UserAlreadyExixts;
 import com.js.authentication.exception.UserNotVerified;
@@ -109,13 +110,12 @@ public class AuthenticationEndpoint {
 
 			Optional<String> accessToken = commonService.getAuthenticationService()
 					.generateAccessToken(loginDto.getUserName(), loginDto.getPassword(), application.getSalt());
-
-			if (!accessToken.isPresent())
-				return new ResponseEntity<String>("User is not verified.", HttpStatus.UNAUTHORIZED);
-
-			return new ResponseEntity<String>(accessToken.get(), HttpStatus.OK);
+ 
+			return new ResponseEntity<String>(accessToken.orElseThrow(() -> new InvalidUserNameAndPassword()), HttpStatus.OK);
+		} catch (UserNotVerified e) {
+			return new ResponseEntity<>(e, HttpStatus.UNAUTHORIZED);
 		} catch (NoSuchUserFound noSuchUserFound) {
-			return new ResponseEntity<>("Invalid Username or password.", HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<>(new InvalidUserNameAndPassword(), HttpStatus.UNAUTHORIZED);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getLocalizedMessage(), e);

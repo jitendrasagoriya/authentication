@@ -3,6 +3,7 @@ package com.js.authentication.service.impl;
 import com.js.authentication.dao.AuthenticationDaoService;
 import com.js.authentication.dao.impl.AuthenticationDaoServiceImpl;
 import com.js.authentication.exception.NoSuchUserFound;
+import com.js.authentication.exception.UserNotVerified;
 import com.js.authentication.model.Authentication;
 import com.js.authentication.password.PasswordUtils;
 import com.js.authentication.service.AuthenticationService;
@@ -80,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public Optional<String> generateAccessToken(String email, String password, String salt) throws NoSuchUserFound {
+	public Optional<String> generateAccessToken(String email, String password, String salt) throws NoSuchUserFound,UserNotVerified {
 		Authentication authentication = getApplication(email, PasswordUtils.generateSecurePassword(password, salt));
 
 		if (authentication == null) {
@@ -88,7 +89,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 
 		if (!authentication.getIsActive()) {
-			return Optional.empty();
+			throw new UserNotVerified();
 		}
 		String assessToken = SecureTokenGenerator.nextAppId(authentication.getAppId());
 		authentication.setToken(assessToken);
