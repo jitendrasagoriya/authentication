@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ApplicationDaoServiceImpl implements ApplicationDaoService<ApplicationRepository> {
@@ -44,8 +45,11 @@ public class ApplicationDaoServiceImpl implements ApplicationDaoService<Applicat
     }
 
     @Override
-    public Application getByName(String name) {
-        return repository.getApplicationByName(name);
+    public  Optional<Application> getByName(String name) {
+    	Application application = repository.getApplicationByName(name);
+    	if(application==null)
+    		return Optional.empty();
+        return Optional.of(application);
     }
 
     @Override
@@ -98,4 +102,9 @@ public class ApplicationDaoServiceImpl implements ApplicationDaoService<Applicat
     public ApplicationRepository getRepository() {
         return repository;
     }
+
+	@Override
+	public List<Application> getApplicationByUserId(String id) {
+		return repository.getApplicationByUserId(id);
+	}
 }

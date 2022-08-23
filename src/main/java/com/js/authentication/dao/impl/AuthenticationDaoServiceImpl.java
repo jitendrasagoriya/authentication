@@ -1,6 +1,7 @@
 package com.js.authentication.dao.impl;
 
 import com.js.authentication.dao.AuthenticationDaoService;
+import com.js.authentication.enums.UserType;
 import com.js.authentication.model.Authentication;
 import com.js.authentication.repository.AuthenticationRepository;
 import org.slf4j.Logger;
@@ -39,8 +40,16 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
     }
 
     @Override
-    public Authentication getApplication(String email, String password) {
-        return authenticationRepository.getApplication(email,password);
+    public Authentication getApplication(String email, String password,UserType type) {
+        return authenticationRepository.getAuthentication(email,password,type);
+    }
+    
+    @Override
+    public Optional<Authentication> getAuthentication(String email, String password,UserType type,String appId) {
+    	Authentication authentication = authenticationRepository.getAuthentication(email,password,type,appId);
+    	if(authentication!=null)
+    		return Optional.of(authentication);
+        return Optional.empty();
     }
 
     @Override
@@ -92,7 +101,7 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
 
 	@Override
 	public Optional<Authentication> getUserByEmail(String email) { 
-		Authentication authentication = authenticationRepository.getAuthentication(email);
+		Authentication authentication = authenticationRepository.getAuthentication(email,UserType.APPUSER);
 		if(authentication==null)
 			return Optional.empty();
 		return Optional.of(authentication);
@@ -106,5 +115,21 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
 	@Override
 	public Authentication findByVerificationCode(String verificationCode) { 
 		return authenticationRepository.findByVerificationCode(verificationCode);
+	}
+
+	@Override
+	public Optional<Authentication> getUserByEmail(String email, UserType userType) { 
+		Authentication authentication = authenticationRepository.getAuthentication(email,userType);
+		if(authentication==null)
+			return Optional.empty();
+		return Optional.of(authentication);
+	}
+	
+	@Override
+	public Optional<Authentication> getUserByEmail(String email, UserType userType,String appId) { 
+		Authentication authentication = authenticationRepository.getAuthentication(email,userType,appId);
+		if(authentication==null)
+			return Optional.empty();
+		return Optional.of(authentication);
 	}
 }

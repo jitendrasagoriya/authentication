@@ -1,13 +1,11 @@
 package com.js.authentication.service;
 
-import com.js.authentication.exception.NoSuchBeanException;
-import com.js.authentication.model.Application;
-import com.js.authentication.model.Authentication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.js.authentication.exception.NoSuchBeanException;
+import com.js.authentication.model.Authentication;
 
 @Service
 public interface CommonService {
@@ -23,4 +21,6 @@ public interface CommonService {
         public ApplicationService getApplicationService();
 
         public AuthenticationService getAuthenticationService();
+        
+        public ApplicationAdminService getApplicationAdminService();
 }

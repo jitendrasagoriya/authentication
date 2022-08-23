@@ -3,6 +3,7 @@ package com.js.authentication.endpoint;
 
 import com.js.authentication.AuthenticationApplication;
 import com.js.authentication.dto.LoginDto;
+import com.js.authentication.enums.UserType;
 import com.js.authentication.model.Authentication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +39,7 @@ public class AuthenticationEndpointTest {
     public void getAccessToken() {
         headers.add("X-AUTH-LOG-HEADER-APP-ACCESS","GHGI5KFJGFKD5");
         headers.setContentType(MediaType.APPLICATION_JSON);
-        LoginDto loginDto = new LoginDto("USER12","myPassword123");
+        LoginDto loginDto = new LoginDto("USER12","myPassword123",UserType.APPUSER);
         HttpEntity<LoginDto> entity = new HttpEntity<LoginDto>(loginDto, headers);
 
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(

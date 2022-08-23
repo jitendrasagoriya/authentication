@@ -1,5 +1,6 @@
 package com.js.authentication.repository;
 
+import com.js.authentication.enums.UserType;
 import com.js.authentication.model.Authentication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ public interface AuthenticationRepository extends JpaRepository<Authentication,S
     public Authentication getActive(@Param("accessToken") String accessToken );
 
     @Query("SELECT A FROM Authentication A WHERE A.userName = :email AND A.passward = :password")
-    public Authentication getApplication(@Param("email") String email, @Param("password") String password );
+    public Authentication getAuthentication(@Param("email") String email, @Param("password") String password );
 
     @Query("SELECT A FROM Authentication A WHERE A.appId = :appId")
     public List<Authentication> getAuthenticationByAppId(@Param("appId")  String appId);
@@ -44,4 +45,16 @@ public interface AuthenticationRepository extends JpaRepository<Authentication,S
     
     @Query("SELECT A FROM Authentication A WHERE A.verificationCode = :verificationCode")
     public Authentication findByVerificationCode(@Param("verificationCode") String verificationCode );
+    
+    @Query("SELECT A FROM Authentication A WHERE A.userName = :email AND userType= :userType")
+    public Authentication getAuthentication(@Param("email") String email , @Param("userType") UserType userType  );
+    
+    @Query("SELECT A FROM Authentication A WHERE A.userName = :email AND userType= :userType  AND appId= :appId")
+    public Authentication getAuthentication(@Param("email") String email , @Param("userType") UserType userType,@Param("appId")String appId   );
+    
+    @Query("SELECT A FROM Authentication A WHERE A.userName = :email AND A.passward = :password AND userType= :userType")
+    public Authentication getAuthentication(@Param("email") String email, @Param("password") String password, @Param("userType") UserType userType  );
+    
+    @Query("SELECT A FROM Authentication A WHERE A.userName = :email AND A.passward = :password AND userType= :userType AND appId= :appId")
+    public Authentication getAuthentication(@Param("email") String email, @Param("password") String password, @Param("userType") UserType userType,@Param("appId") String appId  );
 }

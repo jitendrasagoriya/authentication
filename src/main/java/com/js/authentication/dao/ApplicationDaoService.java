@@ -1,14 +1,18 @@
 package com.js.authentication.dao;
 
 
-import com.js.authentication.exception.NoSuchBeanException;
-import com.js.authentication.model.Application;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Service;
+
+import com.js.authentication.exception.NoSuchBeanException;
+import com.js.authentication.model.Application;
 
 @Service
 public interface ApplicationDaoService<R> extends BaseSerivce<R> {
@@ -21,7 +25,7 @@ public interface ApplicationDaoService<R> extends BaseSerivce<R> {
 
     public Page<Application> getAll(Pageable pageable);
 
-    public Application getByName(String name);
+    public Optional<Application> getByName(String name);
 
     public Application update(Application application);
 
@@ -34,4 +38,6 @@ public interface ApplicationDaoService<R> extends BaseSerivce<R> {
     public Application getByAppAccess( String access) throws NoSuchBeanException;
 
     public Boolean deleteByAppIdAndAccess(String id,String access) throws NoSuchBeanException;
+    
+    List<Application> getApplicationByUserId( String id);
 }

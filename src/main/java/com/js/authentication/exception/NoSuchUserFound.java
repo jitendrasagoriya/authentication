@@ -3,7 +3,7 @@ package com.js.authentication.exception;
 public class NoSuchUserFound extends Exception {
 
 	public NoSuchUserFound() {
-		super();
+		super("User Not Found. UserName");
 	}
 
 	public NoSuchUserFound(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {

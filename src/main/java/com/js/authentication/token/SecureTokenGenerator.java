@@ -72,6 +72,6 @@ public class SecureTokenGenerator {
         }
 
         return sb.toString();
-    }
+    } 
 
 }

@@ -1,9 +1,10 @@
 package com.js.authentication.service.impl;
 
-import com.js.authentication.dao.ApplicationDaoService;
-import com.js.authentication.exception.NoSuchBeanException;
-import com.js.authentication.model.Application;
-import com.js.authentication.service.ApplicationService;
+import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
+import com.js.authentication.dao.ApplicationDaoService;
+import com.js.authentication.exception.NoSuchBeanException;
+import com.js.authentication.model.Application;
+import com.js.authentication.service.ApplicationService;
 
 
 @Service
@@ -61,7 +64,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Application getByName(String name) {
+    public  Optional<Application> getByName(String name) {
         return applicationDaoService.getByName(name);
     }
 
@@ -99,4 +102,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     public Boolean deleteByAppIdAndAccess(String id, String access) throws NoSuchBeanException {
         return applicationDaoService.deleteByAppIdAndAccess(id,access);
     }
+
+	@Override
+	public List<Application> getApplicationByUserId(String id) {
+		return applicationDaoService.getApplicationByUserId(id);
+	}
 }
