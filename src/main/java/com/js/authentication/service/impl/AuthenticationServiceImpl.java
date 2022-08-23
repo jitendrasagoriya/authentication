@@ -1,13 +1,10 @@
 package com.js.authentication.service.impl;
 
-import com.js.authentication.dao.AuthenticationDaoService;
-import com.js.authentication.dao.impl.AuthenticationDaoServiceImpl;
-import com.js.authentication.exception.NoSuchUserFound;
-import com.js.authentication.exception.UserNotVerified;
-import com.js.authentication.model.Authentication;
-import com.js.authentication.password.PasswordUtils;
-import com.js.authentication.service.AuthenticationService;
-import com.js.authentication.token.SecureTokenGenerator;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +12,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
+import com.js.authentication.dao.impl.AuthenticationDaoServiceImpl;
+import com.js.authentication.enums.UserType;
+import com.js.authentication.exception.NoSuchUserFound;
+import com.js.authentication.exception.UserNotRegisteredWithApplication;
+import com.js.authentication.exception.UserNotVerified;
+import com.js.authentication.model.Authentication;
+import com.js.authentication.password.PasswordUtils;
+import com.js.authentication.service.AuthenticationService;
+import com.js.authentication.token.SecureTokenGenerator;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -35,14 +38,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	public Optional<Authentication> getUserByToken(String accessToken) {
 		Authentication authentication = daoService.getUserByToken(accessToken);
-		if(authentication==null)
-			return Optional.empty();		
+		if (authentication == null)
+			return Optional.empty();
 		return Optional.of(authentication);
 	}
 
 	@Override
-	public Authentication getApplication(String email, String password) {
-		return daoService.getApplication(email, password);
+	public Authentication getApplication(String email, String password, UserType type) {
+		return daoService.getApplication(email, password, type);
 	}
 
 	@Override
@@ -81,20 +84,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public Optional<String> generateAccessToken(String email, String password, String salt) throws NoSuchUserFound,UserNotVerified {
-		Authentication authentication = getApplication(email, PasswordUtils.generateSecurePassword(password, salt));
+	public Optional<String> generateAccessToken(String email, String password, String salt, UserType userType,
+			String appId) throws NoSuchUserFound, UserNotVerified, UserNotRegisteredWithApplication {
 
-		if (authentication == null) {
+		Optional<Authentication> optAuthentication = getAuthentication(email,
+				PasswordUtils.generateSecurePassword(password, salt), userType, appId);
+
+		if (!optAuthentication.isPresent()) {
 			throw new NoSuchUserFound(email);
 		}
+
+		Authentication authentication = optAuthentication.get();
+
+		if (!StringUtils.equals(appId, authentication.getAppId()))
+			throw new UserNotRegisteredWithApplication();
 
 		if (!authentication.getIsActive()) {
 			throw new UserNotVerified();
 		}
-		String assessToken = SecureTokenGenerator.nextAppId(authentication.getAppId());
+		String assessToken = SecureTokenGenerator.getToken();
 		authentication.setToken(assessToken);
 		authentication.setIsLogout(false);
 		authentication = updateAuthentication(authentication);
+
+		if (authentication == null)
+			return Optional.empty();
+
+		if (authentication.getUserType().getId() != userType.getId())
+			return Optional.empty();
+
 		return Optional.of(authentication.getToken());
 	}
 
@@ -150,5 +168,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	public Authentication save(Authentication authentication) {
 		return daoService.save(authentication);
+	}
+
+	@Override
+	public Optional<Authentication> getUserByEmail(String email, UserType userType) {
+		return daoService.getUserByEmail(email, userType);
+	}
+
+	@Override
+	public Authentication getAuthentication(String email, String password, UserType userType) {
+		return daoService.getApplication(email, password, userType);
+	}
+
+	@Override
+	public Authentication getApplication(String email, String password) {
+		return null;
+	}
+
+	@Override
+	public Optional<Authentication> getAuthentication(String email, String password, UserType type, String appId) {
+		return daoService.getAuthentication(email, password, type, appId);
+	}
+
+	@Override
+	public Optional<Authentication> getUserByEmail(String email, UserType userType, String appId) {
+		return daoService.getUserByEmail(email, userType, appId);
 	}
 }

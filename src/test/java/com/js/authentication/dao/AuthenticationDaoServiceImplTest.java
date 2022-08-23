@@ -4,6 +4,7 @@ import com.js.authentication.builder.AuthenticationBuilder;
 import com.js.authentication.config.JpaTestConfig;
 import com.js.authentication.config.TestConfig;
 import com.js.authentication.dao.impl.AuthenticationDaoServiceImpl;
+import com.js.authentication.enums.UserType;
 import com.js.authentication.model.Authentication;
 import com.js.authentication.token.SecureTokenGenerator;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class AuthenticationDaoServiceImplTest {
         authentication.setToken(token);
 
         authenticationDaoService.getRepository().save(authentication);
-        Authentication found = authenticationDaoService.getApplication("D579446","123456");
+        Authentication found = authenticationDaoService.getApplication("D579446","123456",UserType.APPUSER);
         assertThat(found.getToken())
                 .isEqualTo(token);
     }

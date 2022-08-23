@@ -2,6 +2,7 @@ package com.js.authentication.endpoint;
 
 import com.js.authentication.dto.ChangePassword;
 import com.js.authentication.dto.LoginDto;
+import com.js.authentication.enums.UserType;
 import com.js.authentication.exception.ApplicationNotRegistered;
 import com.js.authentication.exception.InvalidUserNameAndPassword;
 import com.js.authentication.exception.NoSuchUserFound;
@@ -109,7 +110,7 @@ public class AuthenticationEndpoint {
 			}
 
 			Optional<String> accessToken = commonService.getAuthenticationService()
-					.generateAccessToken(loginDto.getUserName(), loginDto.getPassword(), application.getSalt());
+					.generateAccessToken(loginDto.getUserName(), loginDto.getPassword(), application.getSalt(),UserType.APPUSER,appid);
  
 			return new ResponseEntity<String>(accessToken.orElseThrow(() -> new InvalidUserNameAndPassword()), HttpStatus.OK);
 		} catch (UserNotVerified e) {
@@ -150,7 +151,8 @@ public class AuthenticationEndpoint {
 			Authentication authentication = auth.get();
 			authentication
 					.setPassward(PasswordUtils.generateSecurePassword(request.getNewPassword(), application.getSalt()));
-
+			authentication.setToken(null);
+			authentication.setIsLogout(Boolean.TRUE);
 			commonService.getAuthenticationService().save(authentication);
 
 			return new ResponseEntity<Authentication>(
@@ -175,7 +177,7 @@ public class AuthenticationEndpoint {
 	}
 
 	@PostMapping(path = "forgotPassword/{appid}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<?> add(@PathVariable("appid") String appid,
+	public ResponseEntity<?> forgotPassword(@PathVariable("appid") String appid,
 			@RequestHeader("X-AUTH-LOG-HEADER-APP-ACCESS") String appAccess, @RequestBody String email) {
 		try {
 			Application application = commonService.getApplicationService().getByAppIdAndAccess(appid, appAccess);
@@ -202,6 +204,9 @@ public class AuthenticationEndpoint {
 			authentication.setPassward(
 					PasswordUtils.generateSecurePassword(authentication.getPassward(), application.getSalt()));
 
+			authentication.setToken(null);
+			authentication.setIsLogout(Boolean.TRUE);
+			
 			commonService.getAuthenticationService().save(authentication);
 
 			emailService.sendForgotPassword(tempAuthentication);
@@ -227,22 +232,27 @@ public class AuthenticationEndpoint {
 				logger.error("Application is not registered with us, Application id is :" + appid);
 				return new ResponseEntity<Exception>(new ApplicationNotRegistered(appid), HttpStatus.UNAUTHORIZED);
 			}
-
+			if(authentication.getUserType() == null)
+				authentication.setUserType(UserType.APPUSER);
+			
 			Optional<Authentication> auth = commonService.getAuthenticationService()
-					.getUserByEmail(authentication.getUserName());
+					.getUserByEmail(authentication.getUserName(),authentication.getUserType(),appid);
+			
 			if (auth.isPresent()) {
-				logger.error("User is already registeded.:" + authentication.getUserName());
-				return new ResponseEntity<Exception>(new UserAlreadyExixts(authentication.getUserName()),
-						HttpStatus.FOUND);
+				if (auth.get().getAppId().equalsIgnoreCase(appid)) {
+					logger.error("User is already registeded.:" + authentication.getUserName());
+					return new ResponseEntity<Exception>(new UserAlreadyExixts(authentication.getUserName()),
+							HttpStatus.FOUND);
+				}
 			}
 
 			String randomCode = RandomString.make(64);
 			authentication.setVerificationCode(randomCode);
-
+			
 			authentication.setPassward(
 					PasswordUtils.generateSecurePassword(authentication.getPassward(), application.getSalt()));
 			authentication.setAppId(application.getId());
-			authentication = commonService.getAuthenticationService().save(authentication);
+			authentication = commonService.getAuthenticationService().saveAuthentication(authentication);
 			if(StringUtils.isBlank(appBaseUrl))
 				appBaseUrl = getSiteURL(request);
 			

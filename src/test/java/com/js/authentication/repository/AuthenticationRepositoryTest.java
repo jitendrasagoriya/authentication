@@ -1,9 +1,10 @@
 package com.js.authentication.repository;
 
 
-import com.js.authentication.builder.AuthenticationBuilder;
-import com.js.authentication.model.Authentication;
-import com.js.authentication.password.PasswordUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.sql.Timestamp;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.js.authentication.builder.AuthenticationBuilder;
+import com.js.authentication.model.Authentication;
+import com.js.authentication.password.PasswordUtils;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -52,7 +52,7 @@ public class AuthenticationRepositoryTest {
         entityManager.flush();
 
         Authentication found =
-                repository.getApplication("D579446",PasswordUtils.generateSecurePassword("123456", salt));
+                repository.getAuthentication("D579446",PasswordUtils.generateSecurePassword("123456", salt));
 
         assertThat(found.getAppId()).isEqualTo("APPDOC");
 

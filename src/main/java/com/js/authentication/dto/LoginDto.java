@@ -1,5 +1,7 @@
 package com.js.authentication.dto;
 
+import com.js.authentication.enums.UserType;
+
 import lombok.*;
 
 @AllArgsConstructor
@@ -12,5 +14,6 @@ public class LoginDto {
 
     private String userName;
     private String password;
+    private UserType userType;
 
 }

@@ -1,11 +1,9 @@
 package com.js.authentication.service.impl;
 
-import com.js.authentication.exception.NoSuchBeanException;
-import com.js.authentication.model.Application;
-import com.js.authentication.model.Authentication;
-import com.js.authentication.service.ApplicationService;
-import com.js.authentication.service.AuthenticationService;
-import com.js.authentication.service.CommonService;
+ 
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.js.authentication.exception.NoSuchBeanException;
+import com.js.authentication.model.Application;
+import com.js.authentication.model.Authentication;
+import com.js.authentication.service.ApplicationAdminService;
+import com.js.authentication.service.ApplicationService;
+import com.js.authentication.service.AuthenticationService;
+import com.js.authentication.service.CommonService;
 
 @Service
 public class CommonServiceImpl implements CommonService {
@@ -25,6 +29,9 @@ public class CommonServiceImpl implements CommonService {
 
     @Autowired
     private AuthenticationService authenticationService;
+    
+    @Autowired
+    private ApplicationAdminService applicationAdminService;
 
     @Override
     public Integer totalRegistrationByApplication(String appId) throws NoSuchBeanException {
@@ -83,6 +90,11 @@ public class CommonServiceImpl implements CommonService {
     public AuthenticationService getAuthenticationService() {
         return authenticationService;
     }
+
+	@Override
+	public ApplicationAdminService getApplicationAdminService() {
+		return applicationAdminService;
+	}
 
 
 }
