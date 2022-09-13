@@ -15,6 +15,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebMvc
 @EnableSwagger2
@@ -33,7 +34,7 @@ public class SpringFoxConfig extends WebMvcConfigurerAdapter {
     private ApiInfo apiInfo(){
         return new ApiInfoBuilder()
                 .title("Common Authentication App.")
-                .version("1.0")
+                .version("2.0")
                 .build();
 
     }

@@ -4,6 +4,7 @@ package com.js.authentication.service.impl;
 
 import java.util.List;
 
+import com.js.authentication.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +15,12 @@ import org.springframework.stereotype.Service;
 import com.js.authentication.exception.NoSuchBeanException;
 import com.js.authentication.model.Application;
 import com.js.authentication.model.Authentication;
-import com.js.authentication.service.ApplicationAdminService;
-import com.js.authentication.service.ApplicationService;
-import com.js.authentication.service.AuthenticationService;
-import com.js.authentication.service.CommonService;
 
 @Service
 public class CommonServiceImpl implements CommonService {
 
-    private final Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
+    @SuppressWarnings("unused")
+	private final Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 
     @Autowired
     private ApplicationService applicationService;
@@ -32,6 +30,12 @@ public class CommonServiceImpl implements CommonService {
     
     @Autowired
     private ApplicationAdminService applicationAdminService;
+    
+    @Autowired
+    private DashBoardService dashBoardService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     public Integer totalRegistrationByApplication(String appId) throws NoSuchBeanException {
@@ -95,6 +99,16 @@ public class CommonServiceImpl implements CommonService {
 	public ApplicationAdminService getApplicationAdminService() {
 		return applicationAdminService;
 	}
+
+	@Override
+	public DashBoardService getDashBoardService() {
+		return dashBoardService;
+	}
+
+    @Override
+    public UserDetailsService getUserDetailsService() {
+        return userDetailsService;
+    }
 
 
 }

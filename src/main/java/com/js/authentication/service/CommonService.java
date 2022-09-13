@@ -23,4 +23,8 @@ public interface CommonService {
         public AuthenticationService getAuthenticationService();
         
         public ApplicationAdminService getApplicationAdminService();
+        
+        public DashBoardService getDashBoardService();
+
+        public UserDetailsService getUserDetailsService();
 }

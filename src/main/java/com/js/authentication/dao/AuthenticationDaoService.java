@@ -3,6 +3,7 @@ package com.js.authentication.dao;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,16 @@ public interface AuthenticationDaoService<R> extends BaseSerivce<R> {
     public Page<Authentication> byAppId(String appId, Pageable pageable);
     public boolean updateLastLogin(String accessToken);
     public Boolean deleteByToken(String accessToken);
+    public Boolean deleteById(String id);
     public Page<Authentication> getAll( Pageable pageable);
+    public Page<Authentication> getAll( Example<Authentication> search, Pageable pageable);
     public Optional<Authentication> getUserByEmail(String email);
     public Authentication save(Authentication authentication);
     public Authentication findByVerificationCode(String verificationCode);
     public Optional<Authentication> getUserByEmail(String email,UserType userType);
 	Optional<Authentication> getAuthentication(String email, String password, UserType type, String appId);
-	Optional<Authentication> getUserByEmail(String email, UserType userType, String appId); 
+	Optional<Authentication> getUserByEmail(String email, UserType userType, String appId);
+    public Optional<Authentication> getAuthenticationById(String id);
+    Boolean existsById(String id);
+    Boolean existsById(Example<Authentication> example);
 }

@@ -316,6 +316,7 @@ public class Application implements Serializable {
 			return new Application(this) ;
 		}
 
+		@SuppressWarnings("unused")
 		private void validateUserObject(Authentication authentication) {
 			// Do some basic validations to check
 			// if user object does not break any assumption of system

@@ -56,5 +56,7 @@ public interface AuthenticationRepository extends JpaRepository<Authentication,S
     public Authentication getAuthentication(@Param("email") String email, @Param("password") String password, @Param("userType") UserType userType  );
     
     @Query("SELECT A FROM Authentication A WHERE A.userName = :email AND A.passward = :password AND userType= :userType AND appId= :appId")
-    public Authentication getAuthentication(@Param("email") String email, @Param("password") String password, @Param("userType") UserType userType,@Param("appId") String appId  );
+    public Authentication getAuthentication(@Param("email") String email, @Param("password") String password, @Param("userType") UserType userType,@Param("appId") String appId );
+
+
 }

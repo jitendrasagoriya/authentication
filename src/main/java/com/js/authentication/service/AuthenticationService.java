@@ -1,16 +1,18 @@
 package com.js.authentication.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.js.authentication.enums.UserType;
 import com.js.authentication.exception.NoSuchUserFound;
 import com.js.authentication.exception.UserNotRegisteredWithApplication;
 import com.js.authentication.exception.UserNotVerified;
 import com.js.authentication.model.Authentication;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public interface AuthenticationService {
@@ -39,7 +41,11 @@ public interface AuthenticationService {
 
 	public Boolean deleteByToken(String accessToken);
 
+	public Boolean deleteById(String id);
+
 	public Page<Authentication> getAll(Pageable pageable);
+	
+	public Page<Authentication> getAll(Authentication authentication, Pageable pageable);
 
 	public Optional<Authentication> getUserByEmail(String email);
 
@@ -55,5 +61,12 @@ public interface AuthenticationService {
 	
 	Optional<Authentication> getAuthentication(String email, String password, UserType type, String appId); 
 	
-	Optional<Authentication> getUserByEmail(String email, UserType userType, String appId); 
+	Optional<Authentication> getUserByEmail(String email, UserType userType, String appId);
+
+	public Optional<Authentication> getAuthenticationById(String id);
+
+	Boolean existsById(String id);
+
+	Boolean existsById(Authentication authentication);
 }
+

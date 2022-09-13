@@ -7,6 +7,7 @@ import com.js.authentication.repository.AuthenticationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,8 @@ import java.util.Optional;
 @Service
 public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<AuthenticationRepository> {
 
-    private final Logger logger = LoggerFactory.getLogger(AuthenticationDaoServiceImpl.class);
+    @SuppressWarnings("unused")
+	private final Logger logger = LoggerFactory.getLogger(AuthenticationDaoServiceImpl.class);
 
     @Autowired
     private AuthenticationRepository authenticationRepository;
@@ -90,6 +92,20 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
     }
 
     @Override
+    public Boolean deleteById(String id) {
+        try{
+          boolean found = authenticationRepository.existsById(id);
+          if(found) {
+              authenticationRepository.deleteById(id);
+              return Boolean.TRUE;
+          } else
+              return Boolean.FALSE;
+        }catch (Exception e) {
+            return Boolean.FALSE;
+        }
+    }
+
+    @Override
     public Page<Authentication> getAll(Pageable pageable) {
         return authenticationRepository.findAll(pageable);
     }
@@ -131,5 +147,25 @@ public class AuthenticationDaoServiceImpl implements AuthenticationDaoService<Au
 		if(authentication==null)
 			return Optional.empty();
 		return Optional.of(authentication);
+	}
+
+    @Override
+    public Optional<Authentication> getAuthenticationById(String id) {
+        return authenticationRepository.findById(id);
+    }
+
+    @Override
+    public Boolean existsById(String id) {
+        return authenticationRepository.existsById(id);
+    }
+
+    @Override
+    public Boolean existsById(Example<Authentication> example) {
+        return authenticationRepository.exists(example);
+    }
+
+    @Override
+	public Page<Authentication> getAll(Example<Authentication> search, Pageable pageable) {		 
+		return authenticationRepository.findAll(search, pageable);
 	}
 }

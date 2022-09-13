@@ -1,8 +1,7 @@
 package com.js.authentication.repository;
 
-import com.js.authentication.builder.ApplicationBuilder;
-import com.js.authentication.model.Application;
-import com.js.authentication.password.PasswordUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.js.authentication.builder.ApplicationBuilder;
+import com.js.authentication.model.Application;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -156,6 +157,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
+	public Boolean deleteById(String id) {
+		return daoService.deleteById(id);
+	}
+
+	@Override
 	public Page<Authentication> getAll(Pageable pageable) {
 		return daoService.getAll(pageable);
 	}
@@ -193,5 +199,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	public Optional<Authentication> getUserByEmail(String email, UserType userType, String appId) {
 		return daoService.getUserByEmail(email, userType, appId);
+	}
+
+	@Override
+	public Optional<Authentication> getAuthenticationById(String id) {
+		return daoService.getAuthenticationById(id);
+	}
+
+	@Override
+	public Boolean existsById(String id) {
+		return daoService.existsById(id);
+	}
+
+	@Override
+	public Boolean existsById(Authentication authentication) {
+		Example<Authentication> search = Example.of(authentication);
+		return daoService.existsById(search);
+	}
+
+	@Override
+	public Page<Authentication> getAll(Authentication authentication, Pageable pageable) {	
+		Example<Authentication> search = Example.of(authentication);
+		return daoService.getAll(search, pageable);
 	}
 }

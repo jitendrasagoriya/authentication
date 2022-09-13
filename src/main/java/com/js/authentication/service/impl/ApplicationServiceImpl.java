@@ -21,10 +21,11 @@ import com.js.authentication.service.ApplicationService;
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
 
-    private final Logger logger = LoggerFactory.getLogger(ApplicationServiceImpl.class);
+    @SuppressWarnings("unused")
+	private final Logger logger = LoggerFactory.getLogger(ApplicationServiceImpl.class);
 
     @Autowired
-    private ApplicationDaoService applicationDaoService;
+    private ApplicationDaoService<?> applicationDaoService;
 
     @Override
     public Application addNew(Application application) {
@@ -106,5 +107,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 	@Override
 	public List<Application> getApplicationByUserId(String id) {
 		return applicationDaoService.getApplicationByUserId(id);
+	}
+
+	@Override
+	public Optional<Application> getApplicationByUserIdAndApplication(String id, String appid) {
+		return applicationDaoService.getApplicationByUserIdAndApplication(id, appid);
 	}
 }

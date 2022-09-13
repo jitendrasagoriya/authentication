@@ -2,6 +2,11 @@ package com.js.authentication.exception;
 
 public class NoSuchUserFound extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3328452967452616649L;
+
 	public NoSuchUserFound() {
 		super("User Not Found. UserName");
 	}

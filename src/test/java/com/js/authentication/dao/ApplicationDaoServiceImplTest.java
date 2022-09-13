@@ -1,12 +1,13 @@
 package com.js.authentication.dao;
 
 
-import com.js.authentication.builder.ApplicationBuilder;
-import com.js.authentication.config.JpaTestConfig;
-import com.js.authentication.config.TestConfig;
-import com.js.authentication.exception.NoSuchBeanException;
-import com.js.authentication.model.Application;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.js.authentication.builder.ApplicationBuilder;
+import com.js.authentication.config.JpaTestConfig;
+import com.js.authentication.config.TestConfig;
+import com.js.authentication.exception.NoSuchBeanException;
+import com.js.authentication.model.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
@@ -31,7 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(scripts = {"classpath:application-data.sql"})
 public class ApplicationDaoServiceImplTest {
 
-    @Autowired
+    @SuppressWarnings("rawtypes")
+	@Autowired
     private ApplicationDaoService applicationDaoService;
 
     @Test
@@ -40,7 +41,8 @@ public class ApplicationDaoServiceImplTest {
         applicationDaoService.addNew(application);
     }
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void testGetAll(){
         List<Application> applications = applicationDaoService.getAll();
         assertThat(applications.size()).isEqualTo(4);

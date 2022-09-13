@@ -1,5 +1,6 @@
 package com.js.authentication.exception;
 
+@SuppressWarnings("serial")
 public class UserNotVerified extends Exception{
 
 	public UserNotVerified() {

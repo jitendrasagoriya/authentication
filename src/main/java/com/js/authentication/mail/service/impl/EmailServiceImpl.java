@@ -18,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.js.authentication.mail.EmailHelper;
 import com.js.authentication.mail.model.EmailDetails;
 import com.js.authentication.mail.service.EmailService;
 import com.js.authentication.model.Authentication;
@@ -39,28 +40,20 @@ public class EmailServiceImpl implements EmailService {
 	public void sendVerificationEmail(Authentication user, String siteURL)
 			throws MessagingException, UnsupportedEncodingException {
 		try {
-			String toAddress = user.getUserName();
-			String fromAddress = sender;
-			String senderName = "MehraShaadi";
+			String toAddress = user.getUserName(); 
 			String subject = "Please verify your registration";
 			String content = "Dear [[name]],<br>" + "Please click the link below to verify your registration:<br>"
-					+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "MehraShaadi.org";
+					+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "AuthAsAService.com";
 
-			MimeMessage message = javaMailSender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message);
-
-			helper.setFrom(fromAddress, senderName);
-			helper.setTo(toAddress);
-			helper.setSubject(subject);
+			 
 
 			content = content.replace("[[name]]", user.getUserName());
 			String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
 
 			content = content.replace("[[URL]]", verifyURL);
 
-			helper.setText(content, true);
-
-			javaMailSender.send(message);
+			EmailHelper.sendMailViaGodaddy(toAddress, subject, content);
+			 
 			logger.info("Email send..");
 		} catch (Exception e) {
 			logger.error("Email Not Send..", e);
@@ -72,25 +65,15 @@ public class EmailServiceImpl implements EmailService {
 	public void sendForgotPassword(Authentication user)
 			throws MessagingException, UnsupportedEncodingException {
 		try {
-			String toAddress = user.getUserName();
-			String fromAddress = sender;
-			String senderName = "MehraShaadi";
+			String toAddress = user.getUserName(); ;
 			String subject = "Your password";
 			String content = "Dear [[name]],<br><br><br><br>" + "Your one time password is :<br>" + "<h3>" + user.getPassward()
-					+ "</h3>" + "Thank you,<br>" + "MehraShaadi.org";
-
-			MimeMessage message = javaMailSender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message);
-
-			helper.setFrom(fromAddress, senderName);
-			helper.setTo(toAddress);
-			helper.setSubject(subject);
+					+ "</h3>" + "Thank you,<br>" + "AuthAsAService.com";
+ 
 
 			content = content.replace("[[name]]", user.getUserName());
 
-			helper.setText(content, true);
-
-			javaMailSender.send(message);
+			EmailHelper.sendMailViaGodaddy(toAddress, subject, content);
 			
 			logger.info("Email send..");
 		} catch (Exception e) {

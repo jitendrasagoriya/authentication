@@ -2,6 +2,11 @@ package com.js.authentication.exception;
 
 public class ApplicationAlreadyRegistered extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8161121106913752728L;
+
 	public ApplicationAlreadyRegistered() {
 		 super("Application is already registered with us.");
 	}

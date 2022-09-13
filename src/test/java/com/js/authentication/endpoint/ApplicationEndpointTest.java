@@ -41,7 +41,8 @@ public class ApplicationEndpointTest {
 
 
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     @Sql(statements = {"INSERT INTO APPLICATION (ID,APPNAME,ACCESS,SALT) VALUES ('MYID123','DOCTORAPP1','GHGI5KFJGFKD5','DJFDJFD');"})
     public void testGetAllApplication() throws JSONException {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
