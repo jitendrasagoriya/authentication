@@ -24,12 +24,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.js.authentication.dto.LoginDto;
+import com.js.authentication.dto.LoginResponce;
 import com.js.authentication.enums.UserType;
 import com.js.authentication.exception.ApplicationAlreadyRegistered;
 import com.js.authentication.exception.ApplicationNotRegistered;
 import com.js.authentication.exception.InvalidUserNameAndPassword;
 import com.js.authentication.exception.NoSuchUserFound;
 import com.js.authentication.exception.UserAlreadyExixts;
+import com.js.authentication.exception.UserNotAuthorized;
 import com.js.authentication.exception.UserNotRegisteredWithApplication;
 import com.js.authentication.exception.UserNotVerified;
 import com.js.authentication.mail.service.impl.EmailServiceImpl;
@@ -46,24 +48,32 @@ import net.bytebuddy.utility.RandomString;
 @RequestMapping(path = "api/admin/", produces = { MediaType.APPLICATION_JSON_VALUE })
 public class AdminEndpoint {
 
-	private final Logger logger = LoggerFactory.getLogger(ApplicationEndpoint.class);
+	private final Logger logger = LoggerFactory.getLogger(AdminEndpoint.class);
 
 	@Autowired
 	private CommonService commonService;
 
 	@Autowired
 	private EmailServiceImpl emailService;
-	
-	
+
 	@Value("${common.auth.super.app.id}")
 	private String appId;
-	
+
 	@Value("${common.auth.super.app.access}")
 	private String appAccess;
 
-	@GetMapping()
-	public ResponseEntity<?> getAll(@RequestHeader(name = "X-AUTH-HEADER-TOKEN") String token, Pageable pageable) {
+	@GetMapping(path = { "user/list/", "user/list" })
+	public ResponseEntity<?> getUsers(@RequestHeader(name = "X-AUTH-HEADER-TOKEN") String token, Pageable pageable) {
 		try {
+
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+			if (!authentication.isPresent())
+				return new ResponseEntity<>(new NoSuchUserFound(), HttpStatus.UNAUTHORIZED);
+
+			if (!StringUtils.equalsAnyIgnoreCase(authentication.get().getUserType().getValue(),
+					UserType.SUPERADMIN.getValue()))
+				return new ResponseEntity<>(new UserNotAuthorized(), HttpStatus.UNAUTHORIZED);
+
 			return new ResponseEntity<>(commonService.getAuthenticationService().getAll(pageable), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,12 +82,24 @@ public class AdminEndpoint {
 		}
 	}
 
-	@GetMapping(path = { "{appid/}", "{appid}" })
-	public ResponseEntity<?> getAllByApp(@RequestHeader(name = "X-AUTH-HEADER-TOKEN") String token, Pageable pageable) {
+	@GetMapping(path = { "user/list/{id}/", "user/list/{id}" })
+	public ResponseEntity<?> getApplicationUser(@PathVariable("id") String id,
+			@RequestHeader(name = "X-AUTH-HEADER-TOKEN") String token, Pageable pageable) {
 		try {
-			 String applicationId = "";
-			return new ResponseEntity<>(
-					commonService.getAuthenticationService().getByAppId(applicationId, pageable), HttpStatus.OK);
+
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+			if (!authentication.isPresent())
+				return new ResponseEntity<>(new NoSuchUserFound(), HttpStatus.UNAUTHORIZED);
+
+			if (!StringUtils.equalsAnyIgnoreCase(authentication.get().getUserType().getValue(),
+					UserType.SUPERADMIN.getValue()))
+				return new ResponseEntity<>(new UserNotAuthorized(), HttpStatus.UNAUTHORIZED);
+
+			Authentication search = new Authentication();
+			search.setUserType(UserType.APPUSER);
+			search.setAppId(id);
+			return new ResponseEntity<>(commonService.getAuthenticationService().getAll(search, pageable),
+					HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getLocalizedMessage(), e);
@@ -85,8 +107,70 @@ public class AdminEndpoint {
 		}
 	}
 
-	@PostMapping(path = "token/{appid}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<?> getAccessToken(  @RequestBody LoginDto loginDto) {
+	@GetMapping(path = { "user/admin/list/", "user/admin/list" })
+	public ResponseEntity<?> getApplicationOwner(@RequestHeader(name = "X-AUTH-HEADER-TOKEN") String token,
+			Pageable pageable) {
+		try {
+
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+			if (!authentication.isPresent())
+				return new ResponseEntity<>(new NoSuchUserFound(), HttpStatus.UNAUTHORIZED);
+
+			if (!StringUtils.equalsAnyIgnoreCase(authentication.get().getUserType().getValue(),
+					UserType.SUPERADMIN.getValue()))
+				return new ResponseEntity<>(new UserNotAuthorized(), HttpStatus.UNAUTHORIZED);
+
+			Authentication search = new Authentication();
+			search.setUserType(UserType.APPADMIN);
+
+			return new ResponseEntity<>(commonService.getAuthenticationService().getAll(search, pageable),
+					HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<Exception>(e, HttpStatus.EXPECTATION_FAILED);
+		}
+	}
+
+	@GetMapping(path = { "apps/", "apps" })
+	public ResponseEntity<?> getAllByApp(@RequestHeader(name = "X-AUTH-HEADER-TOKEN") String token, Pageable pageable) {
+		try {
+			String applicationId = "";
+			Authentication search = new Authentication();
+			search.setUserType(UserType.APPUSER);
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+			if (!authentication.isPresent())
+				return new ResponseEntity<>(new NoSuchUserFound(), HttpStatus.UNAUTHORIZED);
+
+			if (StringUtils.equalsAnyIgnoreCase(authentication.get().getUserType().getValue(),
+					UserType.APPADMIN.getValue()))
+				search.setAppId(applicationId);
+
+			return new ResponseEntity<>(commonService.getAuthenticationService().getByAppId(applicationId, pageable),
+					HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<Exception>(e, HttpStatus.EXPECTATION_FAILED);
+		}
+	}
+
+	@GetMapping(path = { "apps/{id}", "apps/{id}/" })
+	public ResponseEntity<?> getAllByAppID(@RequestHeader(name = "X-AUTH-HEADER-TOKEN") String token,
+			Pageable pageable) {
+		try {
+			String applicationId = "";
+			return new ResponseEntity<>(commonService.getAuthenticationService().getByAppId(applicationId, pageable),
+					HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<Exception>(e, HttpStatus.EXPECTATION_FAILED);
+		}
+	}
+
+	@PostMapping(path = "token/", consumes = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<?> getAccessToken(@RequestBody LoginDto loginDto) {
 		if (logger.isDebugEnabled())
 			logger.debug("Fetching access token..");
 		try {
@@ -101,6 +185,47 @@ public class AdminEndpoint {
 					loginDto.getUserName(), loginDto.getPassword(), application.getSalt(), UserType.APPADMIN, appId);
 
 			return new ResponseEntity<String>(accessToken.orElseThrow(() -> new InvalidUserNameAndPassword()),
+					HttpStatus.OK);
+		} catch (UserNotVerified | UserNotRegisteredWithApplication e) {
+			return new ResponseEntity<>(e, HttpStatus.UNAUTHORIZED);
+		} catch (NoSuchUserFound noSuchUserFound) {
+			return new ResponseEntity<>(new InvalidUserNameAndPassword(), HttpStatus.UNAUTHORIZED);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
+		}
+
+	}
+
+	@PostMapping(path = "login/", consumes = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+		if (logger.isDebugEnabled())
+			logger.debug("Fetching access token..");
+		try {
+			Application application = commonService.getApplicationService().getByAppIdAndAccess(appId, appAccess);
+
+			if (application == null) {
+				logger.error("Application is not registered with us, Application id is :" + appId);
+				return new ResponseEntity<Exception>(new ApplicationNotRegistered(appId), HttpStatus.UNAUTHORIZED);
+			}
+
+			Optional<String> accessToken = commonService.getAuthenticationService().generateAccessToken(
+					loginDto.getUserName(), loginDto.getPassword(), application.getSalt(), UserType.APPADMIN, appId);
+
+			Optional<Authentication> auth = commonService.getAuthenticationService().getUserByToken(accessToken.get());
+
+			if (!auth.isPresent())
+				return new ResponseEntity<Exception>(new UserNotAuthorized(), HttpStatus.UNAUTHORIZED);
+
+			LoginResponce responce = LoginResponce.builder()
+					.userId(auth.get().getUserId())
+					.userName(auth.get().getUserName())
+					.userType(auth.get().getUserType())
+					.token(auth.get().getToken())
+					.build();
+
+			return new ResponseEntity<>(responce,
 					HttpStatus.OK);
 		} catch (UserNotVerified | UserNotRegisteredWithApplication e) {
 			return new ResponseEntity<>(e, HttpStatus.UNAUTHORIZED);
@@ -150,7 +275,6 @@ public class AdminEndpoint {
 	public ResponseEntity<?> add(@RequestHeader("X-HEADER-APP-URL") String appBaseUrl,
 			@RequestBody Authentication authentication, HttpServletRequest request) {
 		try {
-			 
 
 			Application application = commonService.getApplicationService().getByAppIdAndAccess(appId, appAccess);
 
@@ -162,7 +286,7 @@ public class AdminEndpoint {
 			authentication.setUserType(UserType.APPADMIN);
 
 			Optional<Authentication> auth = commonService.getAuthenticationService()
-					.getUserByEmail(authentication.getUserName(), authentication.getUserType(),appId);
+					.getUserByEmail(authentication.getUserName(), authentication.getUserType(), appId);
 			if (auth.isPresent()) {
 				logger.error("User is already registeded.:" + authentication.getUserName());
 				return new ResponseEntity<Exception>(new UserAlreadyExixts(authentication.getUserName()),
@@ -190,9 +314,32 @@ public class AdminEndpoint {
 			return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
 		}
 	}
-	
-	
-	
+
+	@GetMapping(path = "auth/")
+	public ResponseEntity<?> getAuthentication(@RequestHeader("X-AUTH-LOG-HEADER-ACCESS") String access) {
+		try {
+			Authentication authentication = null;
+			authentication = commonService.getAuthenticationService().login(access);
+			if (authentication != null) {
+				if (!authentication.getIsActive()) {
+					logger.error("User is not verified.");
+					return new ResponseEntity<Exception>(new UserNotVerified("User is not verified."), HttpStatus.OK);
+				}
+			}
+			Authentication responce = new Authentication.AuthenticationBuilder(authentication).build();
+			authentication = new Authentication();
+			authentication.setUserName(responce.getUserName());
+			authentication.setUserId(responce.getUserId());
+			authentication.setUserType(responce.getUserType());
+			authentication.setToken(responce.getToken());
+
+			return new ResponseEntity<>(authentication, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.EXPECTATION_FAILED);
+		}
+	}
 
 	private String getSiteURL(HttpServletRequest request) {
 		String siteURL = request.getRequestURL().toString();

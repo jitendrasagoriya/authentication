@@ -23,6 +23,9 @@ public interface ApplicationAdminRepository extends JpaRepository<ApplicationAdm
 	@Query("SELECT COUNT (AA.appId) FROM ApplicationAdmin AA WHERE AA.userId = :userId")
 	int applicationCountPerUser(@Param(value = "userId") String userId);
 	
+	@Query(value = "SELECT count(au) FROM authentication au inner join (select ap.* from  application ap inner join applicationadmin aa on ap.id=aa.appid  where aa.userid = :userId) app on au.appid = app.id",nativeQuery = true)
+	int authenticationCountPerAdmin(@Param(value = "userId") String userId);
+	
 	@Query("SELECT COUNT( DISTINCT AA.userId ) FROM ApplicationAdmin AA")
 	int totalUsers();
 	

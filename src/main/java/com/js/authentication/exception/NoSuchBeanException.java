@@ -2,7 +2,12 @@ package com.js.authentication.exception;
 
 public class NoSuchBeanException extends Exception {
 
-    public NoSuchBeanException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public NoSuchBeanException(String message) {
         super(message);
     }
 

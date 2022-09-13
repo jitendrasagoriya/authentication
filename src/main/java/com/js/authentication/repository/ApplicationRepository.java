@@ -28,9 +28,14 @@ public interface ApplicationRepository extends JpaRepository<Application, String
     @Modifying
     @Query("DELETE FROM Application A WHERE A.access = :accessToken AND A.id = :id")
     public int deleteApplicationByAppidAndAccess(@Param("accessToken") String accessToken,
-                                                         @Param("id")  String appId );
+                                                         @Param("id")  String appId );    
     
-    
-    @Query(value = "SELECT A FROM application A INNER JOIN applicationadmin AD on A.id = AD.appid WHERE AD.userid = :id",nativeQuery = true)
+    @Query(value = "SELECT A.* FROM application A INNER JOIN applicationadmin AD on A.id = AD.appid WHERE AD.userid = :id",nativeQuery = true)
     public  List<Application> getApplicationByUserId(@Param("id")  String id);
+    
+    @Query(value = "SELECT A.* FROM application A INNER JOIN applicationadmin AD on A.id = AD.appid WHERE AD.userid = :id and AD.appid= :appid",nativeQuery = true)
+    public  Application getApplicationByUserIdAndApplication(@Param("id")  String id,@Param("appid")  String appid);
+    
+    @Query(value = "SELECT COUNT (A) FROM application A INNER JOIN applicationadmin AD on A.id = AD.appid WHERE AD.userid = :id",nativeQuery = true)
+    public  int getCountByUserId(@Param("id")  String id);
 }

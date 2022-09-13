@@ -71,7 +71,8 @@ public class AuthenticationRepositoryTest {
         assertThat(authentications.getTotalElements()).isEqualTo(5);
     }
 
-    @Test
+    @SuppressWarnings("unused")
+	@Test
     public void updateLoginTimestamp() {
         Authentication authentication = repository.getOne("USER8");
         int recordUpdated = repository.updateLoginTimestamp("HNDHDN655HD5DH");

@@ -2,7 +2,12 @@ package com.js.authentication.exception;
 
 public class ApplicationNotRegistered extends Exception {
 
-    public ApplicationNotRegistered() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3256876775192442910L;
+
+	public ApplicationNotRegistered() {
         super("Application is not registered with us.");
     }
 

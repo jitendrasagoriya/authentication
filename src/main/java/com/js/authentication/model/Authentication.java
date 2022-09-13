@@ -1,18 +1,16 @@
 package com.js.authentication.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.js.authentication.enums.UserType;
 
+import com.js.authentication.service.UserDetailsService;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Timestamp;
 
@@ -67,6 +65,20 @@ public class Authentication {
 	@Enumerated(EnumType.STRING)
 	private UserType userType;
 
+
+	@Transient
+	private UserDetails userDetails;
+	
+	@JsonIgnore
+	public Boolean isAppAdmin() {
+		return StringUtils.equals(this.userType.getValue() ,UserType.APPADMIN.getValue());
+	}
+	
+	@JsonIgnore
+	public Boolean isSuperAdmin() {
+		return StringUtils.equals(this.userType.getValue() ,UserType.SUPERADMIN.getValue());
+	}
+
 	public Authentication(AuthenticationBuilder authenticationBuilder) {
 		this.appId = authenticationBuilder.appId;
 		this.creationDate = authenticationBuilder.creationDate;
@@ -81,6 +93,7 @@ public class Authentication {
 		this.otp = authenticationBuilder.otp;
 		this.verificationCode = authenticationBuilder.verificationCode;
 		this.userType = authenticationBuilder.userType;
+		this.userDetails = authenticationBuilder.userDetails;
 	}
 
 	public static class AuthenticationBuilder {
@@ -99,6 +112,8 @@ public class Authentication {
 		private Boolean otp;
 		private UserType userType;
 
+		private UserDetails userDetails;
+
 		public AuthenticationBuilder() {
 		}
 
@@ -116,6 +131,7 @@ public class Authentication {
 			this.verificationCode = authentication.verificationCode;
 			this.otp = authentication.otp;
 			this.userType = authentication.userType;
+			this.userDetails = authentication.userDetails;
 		}
 
 		public AuthenticationBuilder userType(UserType userType) {
@@ -187,6 +203,13 @@ public class Authentication {
 			this.isActive = isActive;
 			return this;
 		}
+
+		public AuthenticationBuilder userDetails(UserDetails userDetails) {
+			this.userDetails = userDetails;
+			return this;
+		}
+
+
 
 		// Return the finally consrcuted User object
 		public Authentication build() {

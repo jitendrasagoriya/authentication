@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +50,6 @@ public class ApplicationEndpoint {
 			@RequestBody Application application, HttpServletRequest request) {
 		try {
 
-			
 			if (application == null) {
 				return new ResponseEntity<>("application should not be null.", HttpStatus.BAD_REQUEST);
 			}
@@ -69,7 +69,7 @@ public class ApplicationEndpoint {
 				return new ResponseEntity<>(new ApplicationAlreadyRegistered(application.getAppName()),
 						HttpStatus.BAD_REQUEST);
 			}
-			 
+
 			String salt = PasswordUtils.getSalt(10);
 			application.setId(SecureTokenGenerator.nextAppId(application.getAppName()));
 			application.setAccess("ADMIN");
@@ -78,7 +78,7 @@ public class ApplicationEndpoint {
 			application.setDescription(application.getDescription());
 			application.setSalt(salt);
 			application.setAccess(SecureTokenGenerator.getToken());
-			
+
 			Application result = commonService.getApplicationService().addNew(application);
 			try {
 				if (result != null && !StringUtils.isBlank(result.getId())) {
@@ -98,8 +98,53 @@ public class ApplicationEndpoint {
 		}
 	}
 
+	
+	@PutMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<?> update(@RequestHeader("X-AUTH-LOG-HEADER-APP-TOKEN") String token,
+			@RequestBody Application application, HttpServletRequest request) {
+		try {
+
+			if (application == null) {
+				return new ResponseEntity<>("application should not be null.", HttpStatus.BAD_REQUEST);
+			}
+
+			if (StringUtils.isBlank(application.getAppName()))
+				return new ResponseEntity<>("App Name Should Not Null.", HttpStatus.BAD_REQUEST);
+
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+
+			if (!authentication.isPresent()) {
+				return new ResponseEntity<>(new NoSuchUserFound(), HttpStatus.BAD_REQUEST);
+			}
+
+			Optional<Application> optionalAppliacation = commonService.getApplicationService()
+					.getApplicationByUserIdAndApplication(authentication.get().getUserId(), application.getId());
+
+			if (!optionalAppliacation.isPresent()) {
+				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
+			}	
+			
+			Application requestApplication = optionalAppliacation.get();
+			
+			requestApplication.setAppName(application.getAppName());
+			requestApplication.setDescription(application.getDescription());
+			requestApplication.setSalt(application.getSalt());
+			requestApplication.setIsActive(application.getIsActive());
+
+			Application result = commonService.getApplicationService().update(requestApplication);			
+
+			return new ResponseEntity<Application>(result, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<Exception>(e, HttpStatus.EXPECTATION_FAILED);
+		}
+	}
+	
+	
+	
 	@GetMapping
-	public ResponseEntity<?> getAllApplication(@RequestHeader("X-AUTH-LOG-HEADER-APP-TOKEN") String token) {
+	public ResponseEntity<?> getAllApplication(@RequestHeader("X-AUTH-LOG-HEADER-TOKEN") String token) {
 		try {
 
 			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
@@ -108,7 +153,9 @@ public class ApplicationEndpoint {
 				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
 			}
 
-			return new ResponseEntity<List<Application>>(commonService.getApplicationService().getApplicationByUserId(authentication.get().getUserId()), HttpStatus.OK);
+			return new ResponseEntity<List<Application>>(
+					commonService.getApplicationService().getApplicationByUserId(authentication.get().getUserId()),
+					HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getLocalizedMessage(), e);
@@ -118,10 +165,22 @@ public class ApplicationEndpoint {
 
 	@GetMapping(path = "{appid}")
 	public ResponseEntity<?> getApplication(@PathVariable("appid") String appid,
-			@RequestHeader("X-AUTH-LOG-HEADER") String access) {
+			@RequestHeader("X-AUTH-LOG-HEADER-TOKEN") String token) {
 		try {
-			return new ResponseEntity<Application>(
-					commonService.getApplicationService().getByAppIdAndAccess(appid, access), HttpStatus.OK);
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+
+			if (!authentication.isPresent()) {
+				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
+			}
+
+			Optional<Application> application = commonService.getApplicationService()
+					.getApplicationByUserIdAndApplication(authentication.get().getUserId(), appid);
+
+			if (!application.isPresent()) {
+				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
+			}
+
+			return new ResponseEntity<Application>(application.get(), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getLocalizedMessage(), e);
@@ -131,10 +190,24 @@ public class ApplicationEndpoint {
 
 	@GetMapping(path = "page/{appid}")
 	public ResponseEntity<?> getAuthenticationsForApplication(@PathVariable("appid") String appid,
-			@RequestHeader("X-AUTH-LOG-HEADER") String access, Pageable pageable) {
+			@RequestHeader("X-AUTH-LOG-HEADER-TOKEN") String token, Pageable pageable) {
 		try {
+
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+
+			if (!authentication.isPresent()) {
+				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
+			}
+
+			Optional<Application> application = commonService.getApplicationService()
+					.getApplicationByUserIdAndApplication(authentication.get().getUserId(), appid);
+
+			if (!application.isPresent()) {
+				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
+			}
+
 			return new ResponseEntity<Page<Authentication>>(
-					commonService.getRegistrationByApplication(appid, access, pageable), HttpStatus.OK);
+					commonService.getRegistrationByApplication(appid, token, pageable), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getLocalizedMessage(), e);
@@ -144,9 +217,23 @@ public class ApplicationEndpoint {
 
 	@DeleteMapping(path = "{appid}")
 	public ResponseEntity<?> deleteApplication(@PathVariable("appid") String appid,
-			@RequestHeader("X-AUTH-LOG-HEADER") String access) {
+			@RequestHeader("X-AUTH-LOG-HEADER-TOKEN") String token) {
 		try {
-			Boolean isDeleted = commonService.getApplicationService().deleteByAppIdAndAccess(appid, access);
+
+			Optional<Authentication> authentication = commonService.getAuthenticationService().getUserByToken(token);
+
+			if (!authentication.isPresent()) {
+				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
+			}
+
+			Optional<Application> application = commonService.getApplicationService()
+					.getApplicationByUserIdAndApplication(authentication.get().getUserId(), appid);
+
+			if (!application.isPresent()) {
+				return new ResponseEntity<>("Invalid User.", HttpStatus.UNAUTHORIZED);
+			}
+
+			Boolean isDeleted = commonService.getApplicationService().delete(application.get().getId());
 			return new ResponseEntity<Boolean>(isDeleted, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();

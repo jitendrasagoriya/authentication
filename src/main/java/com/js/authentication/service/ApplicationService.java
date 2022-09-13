@@ -1,14 +1,14 @@
 package com.js.authentication.service;
 
-import com.js.authentication.exception.NoSuchBeanException;
-import com.js.authentication.model.Application;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.js.authentication.exception.NoSuchBeanException;
+import com.js.authentication.model.Application;
 
 @Service
 public interface ApplicationService {
@@ -28,4 +28,5 @@ public interface ApplicationService {
     public Application getByAppAccess(String access) throws NoSuchBeanException;
     public Boolean deleteByAppIdAndAccess(String id, String access) throws NoSuchBeanException;
     List<Application> getApplicationByUserId( String id);
+    public Optional<Application> getApplicationByUserIdAndApplication(String id, String appid) ;
 }

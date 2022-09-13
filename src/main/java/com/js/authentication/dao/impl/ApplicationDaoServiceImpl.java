@@ -107,4 +107,17 @@ public class ApplicationDaoServiceImpl implements ApplicationDaoService<Applicat
 	public List<Application> getApplicationByUserId(String id) {
 		return repository.getApplicationByUserId(id);
 	}
+
+	@Override
+	public Optional<Application> getApplicationByUserIdAndApplication(String id, String appid) { 
+		Application application = repository.getApplicationByUserIdAndApplication(id, appid);
+		if(application == null)
+			return Optional.empty();
+		return Optional.of(application) ;
+	}
+
+    @Override
+    public Boolean foundById(String id) {
+        return repository.existsById(id);
+    }
 }
